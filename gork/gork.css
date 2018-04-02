@@ -1,0 +1,30 @@
+table.outerTextBox, th.outerTextBox, td.outerTextBox {
+	background-color: #DDDDDD;
+	border: 1px solid black;
+	border-collapse: collapse;
+	width: 75%;
+	height: 45em;
+}
+
+input#cli {
+	background-color: transparent;
+	border: 1px solid transparent;
+	width:90%;
+	outline: none;
+}
+
+div#output {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	background-color: transparent;
+	resize: none;
+	border: 1px solid transparent;
+	outline: none;
+	white-space: pre;
+	max-height: 42em;
+	overflow: hidden;
+}
+
+td.output {
+	vertical-align: bottom;
+}

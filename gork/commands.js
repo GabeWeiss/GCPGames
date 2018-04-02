@@ -1,0 +1,9 @@
+var cmdHash = new Object();
+cmdHash['n'] = "north";
+cmdHash['north'] = "north";
+cmdHash['s'] = "south";
+cmdHash['south'] = "south";
+cmdHash['w'] = "west";
+cmdHash['west'] = "west";
+cmdHash['e'] = "east";
+cmdHash['east'] = "east";

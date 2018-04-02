@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF=8">
+    <link rel="stylesheet" href="gork.css">
+    <script src="commands.js"></script>
+
+    <script type="text/javascript">
+
+    	function getCurrentText() {
+    		var curText = document.getElementById('output').textContent;
+
+    		// note that there's roughly 32 newlines worth of space I want to accommodate
+    		var i = 0;
+    		var index = -1;
+    		var tmpIndex = -1;
+    		while (i < 32) {
+    			var startPos = index == -1 ? curText.length : index - 1;
+    			console.log("My start search position is: " + startPos);
+    			tmpIndex = curText.lastIndexOf("\n", startPos);
+    			if (tmpIndex == -1 && index == -1)
+    				return curText;
+    			else
+    				index = tmpIndex;
+    			if (tmpIndex == -1)
+    				break;
+    			++i;
+    		}
+
+  			console.log("Index of last newline: " + index);
+    		console.log("Length of string: " + curText.length);
+
+    		return curText.substr(-1 * (curText.length - index));
+    	}
+
+        function testInput() {
+        	var cmd = document.getElementById("cli").value;
+        	var appendText = "";
+           	var curText = getCurrentText();
+            if (!cmdHash.hasOwnProperty(cmd)) {
+            	appendText = "\n\nI'm not sure what you mean by " + cmd + ".";
+            }
+
+            if (appendText !== "") {
+            	var finalText = curText + appendText;
+            	document.getElementById('output').textContent = finalText.replace(/^\s+|\s+$/g, '');
+            	return;
+            }
+
+
+            // DO STUFF WITH COMMAND
+
+
+            // UPDATE LOCATION
+            document.cookie = "current_location=" + cmd;
+
+        }
+
+        function focusTextField() {
+        	document.getElementById('cli').focus();
+        }
+    </script>
+
+</head>
+<body onload="focusTextField()" onfocus="focusTextField()">
+    <table class="outerTextBox">
+    	<tr>
+    		<td>&nbsp;</td>
+    		<td colspan="2" class="output">
+    			<div name="output" id="output"></div>
+    		</td>
+    	</tr>
+    	<tr height=20>
+    		<td width=10>&nbsp;</td>
+    		<td width=10>$</td>
+    		<td>
+    			<form onsubmit="testInput();return false;">
+    				<input type="text" name="cli" id="cli" width=100% />
+    			</form>
+    		</td>
+    	</tr>
+    	<tr height=10>
+    		<td>&nbsp;</td>
+    		<td>&nbsp;</td>
+    		<td>&nbsp;</td>
+    	</tr>
+    </table>
+</body>
+</html>
