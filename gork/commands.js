@@ -7,3 +7,5 @@ cmdHash['w'] = "west";
 cmdHash['west'] = "west";
 cmdHash['e'] = "east";
 cmdHash['east'] = "east";
+cmdHash['l'] = "look";
+cmdHash['look'] = "look";
