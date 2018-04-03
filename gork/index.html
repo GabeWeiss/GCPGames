@@ -6,6 +6,21 @@
     <script src="commands.js"></script>
 
     <script type="text/javascript">
+        var LOCATION_KEY = "current_location";
+
+
+        function getCookie(name) {
+            let cookie = {};
+            document.cookie.split(';').forEach(function(el) {
+                let [k,v] = el.split('=');
+                cookie[k.trim()] = v;
+            })
+          return cookie[name];
+        }
+
+        function getLocation() {
+            return getCookie(LOCATION_KEY);
+        }
 
     	function getCurrentText() {
     		var curText = document.getElementById('output').textContent;
@@ -14,9 +29,8 @@
     		var i = 0;
     		var index = -1;
     		var tmpIndex = -1;
-    		while (i < 32) {
+    		while (i < 34) {
     			var startPos = index == -1 ? curText.length : index - 1;
-    			console.log("My start search position is: " + startPos);
     			tmpIndex = curText.lastIndexOf("\n", startPos);
     			if (tmpIndex == -1 && index == -1)
     				return curText;
@@ -26,34 +40,42 @@
     				break;
     			++i;
     		}
-
-  			console.log("Index of last newline: " + index);
-    		console.log("Length of string: " + curText.length);
-
     		return curText.substr(-1 * (curText.length - index));
     	}
 
         function testInput() {
         	var cmd = document.getElementById("cli").value;
-        	var appendText = "";
+            var cmds = cmd.split(" ");
+        	var appendText = "$" + cmd + "\n";
            	var curText = getCurrentText();
-            if (!cmdHash.hasOwnProperty(cmd)) {
-            	appendText = "\n\nI'm not sure what you mean by " + cmd + ".";
+            if (!cmdHash.hasOwnProperty(cmds[0])) {
+            	appendText += "I'm not sure what you mean by \"" + cmd + "\".\n\n";
             }
+
+            // DO STUFF WITH COMMAND
+            if (0) {
+
+            }
+
 
             if (appendText !== "") {
             	var finalText = curText + appendText;
-            	document.getElementById('output').textContent = finalText.replace(/^\s+|\s+$/g, '');
-            	return;
+            	document.getElementById('output').textContent = finalText;
+            }
+            else {
+                return;
             }
 
 
-            // DO STUFF WITH COMMAND
 
 
             // UPDATE LOCATION
-            document.cookie = "current_location=" + cmd;
+            /*
+            var locationVal = LOCATION_KEY + "=COOOOKIE" + cmd;
+            document.cookie = locationVal;
 
+            console.log(getLocation());
+            */
         }
 
         function focusTextField() {
