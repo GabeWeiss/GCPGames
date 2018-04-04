@@ -4,9 +4,17 @@
     <meta charset="UTF=8">
     <link rel="stylesheet" href="gork.css">
     <script src="commands.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.12.0/firebase-firestore.js"></script>
+    <script src="gork_firebase.js"></script>
 
     <script type="text/javascript">
         var LOCATION_KEY = "current_location";
+
+
+        var dbase = firebase.firestore();
+        var db_gork = dbase.collection("gork");
+        var db_locs = db_gork.doc("locations");
 
 
         function getCookie(name) {
@@ -43,30 +51,41 @@
     		return curText.substr(-1 * (curText.length - index));
     	}
 
+        function parseAndAddDescription(desc, output) {
+            var bracketExp = /<([^>]+)>([^<]*)/;
+            var match = bracketExp.exec(desc);
+            output.appendChild(document.createTextNode(match[2]));
+        }
+
         function testInput() {
         	var cmd = document.getElementById("cli").value;
             var cmds = cmd.split(" ");
         	var appendText = "$" + cmd + "\n";
            	var curText = getCurrentText();
+
+
+            var output = document.getElementById("output");
+            output.textContent = "";
+            output.appendChild(document.createTextNode("$ " + cmd + "\n"));
+
             if (!cmdHash.hasOwnProperty(cmds[0])) {
-            	appendText += "I'm not sure what you mean by \"" + cmd + "\".\n\n";
+            	output.appendChild(document.createTextNode("I'm not sure what you mean by \"" + cmd + "\".\n\n"));
             }
 
             // DO STUFF WITH COMMAND
-            if (0) {
 
-            }
+            var locations = db_gork.doc("locations");
 
-
-            if (appendText !== "") {
-            	var finalText = curText + appendText;
-            	document.getElementById('output').textContent = finalText;
-            }
-            else {
-                return;
-            }
-
-
+            locations.get().then(function(doc) {
+                if (doc.exists) {
+                    parseAndAddDescription(doc.data()["0,0"]["description"], output);
+                }
+                else {
+                    console.log("No such document.");
+                }
+            }).catch(function(error) {
+                console.log("Error getting document: ", error);
+            });
 
 
             // UPDATE LOCATION
