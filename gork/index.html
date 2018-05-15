@@ -37,7 +37,7 @@
     		var i = 0;
     		var index = -1;
     		var tmpIndex = -1;
-    		while (i < 34) {
+    		while (i < 26) {
     			var startPos = index == -1 ? curText.length : index - 1;
     			tmpIndex = curText.lastIndexOf("\n", startPos);
     			if (tmpIndex == -1 && index == -1)
@@ -51,38 +51,45 @@
     		return curText.substr(-1 * (curText.length - index));
     	}
 
-        function parseAndAddDescription(desc, output) {
-            var bracketExp = /<([^>]+)>([^<]*)/;
-            var match = bracketExp.exec(desc);
-            output.appendChild(document.createTextNode(match[2]));
+        function parseAndAddDescription(desc, loc, output) {
+            var b = document.createElement("b");
+            var formattedLoc = document.createTextNode(loc + "\n");
+            b.appendChild(formattedLoc);
+            output.appendChild(b);
+            var descList = desc.split("\\n");
+            descList.forEach(function(d) {
+                output.appendChild(document.createTextNode(d + "\n"));
+            });
+            output.appendChild(document.createTextNode("\n"));
         }
 
         function testInput() {
         	var cmd = document.getElementById("cli").value;
             var cmds = cmd.split(" ");
         	var appendText = "$" + cmd + "\n";
-           	var curText = getCurrentText();
+//           	var curText = getCurrentText();
 
 
             var output = document.getElementById("output");
-            output.textContent = "";
+//            output.textContent = getCurrentText();
             output.appendChild(document.createTextNode("$ " + cmd + "\n"));
 
             if (!cmdHash.hasOwnProperty(cmds[0])) {
             	output.appendChild(document.createTextNode("I'm not sure what you mean by \"" + cmd + "\".\n\n"));
             }
 
-            // DO STUFF WITH COMMAND
-
-            var locations = db_gork.doc("locations");
+           var locations = db_gork.doc("locations");
 
             locations.get().then(function(doc) {
                 if (doc.exists) {
-                    parseAndAddDescription(doc.data()["0,0"]["description"], output);
+                    var locDoc = doc.data()["0,0"];
+                    parseAndAddDescription(locDoc["description"], locDoc["location"], output);
                 }
                 else {
                     console.log("No such document.");
                 }
+                    // this will need to be called again if text is added elsewhere.
+                output.scrollTop = output.scrollHeight - output.clientHeight;
             }).catch(function(error) {
                 console.log("Error getting document: ", error);
             });
@@ -95,6 +102,7 @@
 
             console.log(getLocation());
             */
+
         }
 
         function focusTextField() {

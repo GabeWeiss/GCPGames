@@ -18,13 +18,25 @@ div#output {
 	margin-bottom: 5px;
 	background-color: transparent;
 	resize: none;
-	border: 1px solid transparent;
+	border-top: 1px solid transparent;
+	border-left: 1px solid transparent;
+	border-right: 1px solid transparent;
+	border-bottom: 1px solid darkgrey;
 	outline: none;
 	white-space: pre;
 	max-height: 42em;
-	overflow: hidden;
+	overflow: auto;
 }
 
 td.output {
 	vertical-align: bottom;
+}
+
+::-webkit-scrollbar {
+	background-color: transparent;
+	width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+	background-color: darkgray;
 }
