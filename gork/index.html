@@ -66,13 +66,9 @@
         function testInput() {
         	var cmd = document.getElementById("cli").value;
             var cmds = cmd.split(" ");
-        	var appendText = "$" + cmd + "\n";
-//           	var curText = getCurrentText();
-
 
             var output = document.getElementById("output");
-//            output.textContent = getCurrentText();
-            output.appendChild(document.createTextNode("$ " + cmd + "\n"));
+            output.appendChild(document.createTextNode("\n$ " + cmd + "\n"));
 
             if (!cmdHash.hasOwnProperty(cmds[0])) {
             	output.appendChild(document.createTextNode("I'm not sure what you mean by \"" + cmd + "\".\n\n"));
@@ -108,10 +104,24 @@
         function focusTextField() {
         	document.getElementById('cli').focus();
         }
+
+        function startup() {
+            focusTextField();
+
+            var startMsg = db_gork.doc("welcome-message");
+            startMsg.get().then(function(doc) {
+                var msg = doc.data().msg;
+                var msgSplit = msg.split("\\n");
+                var output = document.getElementById("output");
+                msgSplit.forEach(function(m) {
+                    output.appendChild(document.createTextNode(m + "\n"));
+                });
+            });
+        }
     </script>
 
 </head>
-<body onload="focusTextField()" onfocus="focusTextField()">
+<body onload="startup()" onfocus="focusTextField()">
     <table class="outerTextBox">
     	<tr>
     		<td>&nbsp;</td>
