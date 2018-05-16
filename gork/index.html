@@ -61,27 +61,6 @@
             return getCookie(LOCATION_KEY);
         }
 
-    	function getCurrentText() {
-    		var curText = document.getElementById('output').textContent;
-
-    		// note that there's roughly 32 newlines worth of space I want to accommodate
-    		var i = 0;
-    		var index = -1;
-    		var tmpIndex = -1;
-    		while (i < 26) {
-    			var startPos = index == -1 ? curText.length : index - 1;
-    			tmpIndex = curText.lastIndexOf("\n", startPos);
-    			if (tmpIndex == -1 && index == -1)
-    				return curText;
-    			else
-    				index = tmpIndex;
-    			if (tmpIndex == -1)
-    				break;
-    			++i;
-    		}
-    		return curText.substr(-1 * (curText.length - index));
-    	}
-
         function parseAndAddDescription(desc, loc, output) {
             var b = document.createElement("b");
             var formattedLoc = document.createTextNode(loc + "\n");
@@ -95,14 +74,18 @@
         }
 
         function testInput() {
-        	var cmd = document.getElementById("cli").value;
+            var cmdInput = document.getElementById("cli");
+        	var cmd = cmdInput.value;
             var cmds = cmd.split(" ");
+                // clear text field after command is given.
+            cmdInput.value = "";
 
             var output = document.getElementById("output");
             output.appendChild(document.createTextNode("\n$ " + cmd + "\n"));
 
             if (!cmdHash.hasOwnProperty(cmds[0])) {
-            	output.appendChild(document.createTextNode("I'm not sure what you mean by \"" + cmd + "\".\n\n"));
+                output.appendChild(document.createTextNode("I'm not sure what you mean by \"" + cmd + "\".\n\n"));
+                return;
             }
 
            var locations = db_gork.doc("locations");
@@ -136,6 +119,17 @@
         	document.getElementById('cli').focus();
         }
 
+        function displayStartMsg() {
+            var startMsg = db_gork.doc("welcome-message");
+            startMsg.get().then(function(doc) {
+                var msg = doc.data().msg;
+                var msgSplit = msg.split("\\n");
+                msgSplit.forEach(function(m) {
+                    output.appendChild(document.createTextNode(m + "\n"));
+                });
+            });
+        }
+
         function startup() {
             focusTextField();
 
@@ -148,24 +142,23 @@
                     return;
                 }
 
+                var output = document.getElementById("output");
                 players.get().then(function(p) {
                     var players_array = p.data().players;
-                    var player_index = contains.call(players_array, player_name_prompt);
-                    console.log(player_index);
-                });
-                
+                    var player_exists = contains.call(players_array, player_name_prompt);
+                    if (player_exists) {
+                        document.getElementById("input").style.display = "none";
+                        document.getElementById("output").textContent = "This player already exists.\nPlease refresh the page and enter a new name.";
+                        return;
+                    }
+
+                    displayStartMsg();
+                });                
                 // do the rest of the process
             }
-
-            var startMsg = db_gork.doc("welcome-message");
-            startMsg.get().then(function(doc) {
-                var msg = doc.data().msg;
-                var msgSplit = msg.split("\\n");
-                var output = document.getElementById("output");
-                msgSplit.forEach(function(m) {
-                    output.appendChild(document.createTextNode(m + "\n"));
-                });
-            });
+            else {
+                displayStartMsg();
+            }
         }
     </script>
 
