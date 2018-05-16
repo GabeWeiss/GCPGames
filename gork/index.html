@@ -9,12 +9,43 @@
     <script src="gork_firebase.js"></script>
 
     <script type="text/javascript">
+        var PLAYER_ID    = "player_id";
         var LOCATION_KEY = "current_location";
-
 
         var dbase = firebase.firestore();
         var db_gork = dbase.collection("gork");
         var db_locs = db_gork.doc("locations");
+        var db_player_locs = db_gork.doc("player-locations");
+        var players = dbase.collection("players").doc("players");
+
+        var p_id;
+
+
+        var contains = function(needle) {
+            // Per spec, the way to identify NaN is that it is not equal to itself
+            var findNaN = needle !== needle;
+            var indexOf;
+
+            if(!findNaN && typeof Array.prototype.indexOf === 'function') {
+                indexOf = Array.prototype.indexOf;
+            }
+            else {
+                indexOf = function(needle) {
+                    var i = -1, index = -1;
+
+                    for(i = 0; i < this.length; i++) {
+                        var item = this[i];
+
+                        if((findNaN && item !== item) || item === needle) {
+                            index = i;
+                            break;
+                        }
+                    }
+                    return index;
+                };
+            }
+            return indexOf.call(this, needle) > -1;
+        };
 
 
         function getCookie(name) {
@@ -108,6 +139,24 @@
         function startup() {
             focusTextField();
 
+            p_id = getCookie(PLAYER_ID);
+            if (p_id === undefined) {
+                var player_name_prompt = prompt("Welcome! What would you like me to call you?");
+                if (player_name_prompt === null || player_name_prompt === "" || player_name_prompt === undefined) {
+                    document.getElementById("input").style.display = "none";
+                    document.getElementById("output").textContent = "You can't play if I don't know what to call you.\nPlease refresh the page and enter a name.";
+                    return;
+                }
+
+                players.get().then(function(p) {
+                    var players_array = p.data().players;
+                    var player_index = contains.call(players_array, player_name_prompt);
+                    console.log(player_index);
+                });
+                
+                // do the rest of the process
+            }
+
             var startMsg = db_gork.doc("welcome-message");
             startMsg.get().then(function(doc) {
                 var msg = doc.data().msg;
@@ -133,9 +182,11 @@
     		<td width=10>&nbsp;</td>
     		<td width=10>$</td>
     		<td>
-    			<form onsubmit="testInput();return false;">
-    				<input type="text" name="cli" id="cli" width=100% />
-    			</form>
+                <div name="input" id="input">
+                    <form onsubmit="testInput();return false;">
+                        <input type="text" name="cli" id="cli" width=100% />
+                    </form>
+                </div>
     		</td>
     	</tr>
     	<tr height=10>
